@@ -75,8 +75,9 @@ public interface MediaItemTag {
 
     @NonNull
     default MediaItem asMediaItem() {
+        Uri uri = Uri.parse(getStreamUrl());
         final MediaMetadata mediaMetadata = new MediaMetadata.Builder()
-                .setMediaUri(Uri.parse(getStreamUrl()))
+                .setMediaUri(uri)
                 .setArtworkUri(Uri.parse(getThumbnailUrl()))
                 .setArtist(getUploaderName())
                 .setDescription(getTitle())
@@ -84,7 +85,7 @@ public interface MediaItemTag {
                 .setTitle(getTitle())
                 .build();
 
-        return MediaItem.fromUri(getStreamUrl())
+        return MediaItem.fromUri(uri)
                 .buildUpon()
                 .setMediaId(makeMediaId())
                 .setMediaMetadata(mediaMetadata)
