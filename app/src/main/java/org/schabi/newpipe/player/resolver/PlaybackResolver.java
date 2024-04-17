@@ -4,6 +4,7 @@ import static org.schabi.newpipe.extractor.stream.AudioStream.UNKNOWN_BITRATE;
 import static org.schabi.newpipe.extractor.stream.VideoStream.RESOLUTION_UNKNOWN;
 import static org.schabi.newpipe.player.helper.PlayerDataSource.LIVE_STREAM_EDGE_GAP_MILLIS;
 
+import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
 
@@ -20,6 +21,7 @@ import com.google.android.exoplayer2.source.hls.HlsMediaSource;
 import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource;
 import com.google.android.exoplayer2.source.smoothstreaming.manifest.SsManifest;
 import com.google.android.exoplayer2.source.smoothstreaming.manifest.SsManifestParser;
+import com.google.android.exoplayer2.upstream.DefaultDataSource;
 
 import org.schabi.newpipe.extractor.MediaFormat;
 import org.schabi.newpipe.extractor.ServiceList;
@@ -254,9 +256,11 @@ public interface PlaybackResolver extends Resolver<StreamInfo, MediaSource> {
                                         final Stream stream,
                                         final StreamInfo streamInfo,
                                         final String cacheKey,
-                                        final MediaItemTag metadata) throws ResolverException {
+                                        final MediaItemTag metadata,
+                                        final Context context) throws ResolverException {
         if (streamInfo.getService() == ServiceList.YouTube) {
-            return createYoutubeMediaSource(stream, streamInfo, dataSource, cacheKey, metadata);
+            return createYoutubeMediaSource(stream, streamInfo, dataSource, cacheKey, metadata,
+                    context);
         }
 
         final DeliveryMethod deliveryMethod = stream.getDeliveryMethod();
@@ -398,7 +402,8 @@ public interface PlaybackResolver extends Resolver<StreamInfo, MediaSource> {
                                                         final StreamInfo streamInfo,
                                                         final PlayerDataSource dataSource,
                                                         final String cacheKey,
-                                                        final MediaItemTag metadata)
+                                                        final MediaItemTag metadata,
+                                                        final Context context)
             throws ResolverException {
         if (!(stream instanceof AudioStream || stream instanceof VideoStream)) {
             throw new ResolverException("Generation of YouTube DASH manifest for "
@@ -429,6 +434,20 @@ public interface PlaybackResolver extends Resolver<StreamInfo, MediaSource> {
                 throw new ResolverException(
                         "Error when generating the DASH manifest of YouTube ended live stream", e);
             }
+        } else if (streamType == StreamType.AUDIO_STREAM) {
+            final String url = streamInfo.getUrl();
+
+            final DefaultDataSource.Factory dataSourceFactory =
+                    new DefaultDataSource.Factory(context);
+
+            final MediaItem mediaItem = new MediaItem.Builder()
+                    .setUri(Uri.parse(url))
+                    .build();
+
+            return new ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(
+                    mediaItem
+            );
+
         } else {
             throw new ResolverException(
                     "DASH manifest generation of YouTube livestreams is not supported");

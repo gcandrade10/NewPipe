@@ -637,7 +637,7 @@ public final class Player implements PlaybackListener, Listener {
         }
 
         if (playQueue != null) {
-            playQueueManager = new MediaSourceManager(this, playQueue);
+            playQueueManager = new MediaSourceManager(this, playQueue, context);
         }
     }
 
