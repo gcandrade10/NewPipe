@@ -27,6 +27,7 @@ public final class Migrations {
     public static final int DB_VER_7 = 7;
     public static final int DB_VER_8 = 8;
     public static final int DB_VER_9 = 9;
+    public static final int DB_VER_10 = 10;
 
     private static final String TAG = Migrations.class.getName();
     public static final boolean DEBUG = MainActivity.DEBUG;
@@ -299,6 +300,19 @@ public final class Migrations {
             } finally {
                 database.endTransaction();
             }
+        }
+    };
+
+    public static final Migration MIGRATION_9_10 = new Migration(DB_VER_9, DB_VER_10) {
+        @Override
+        public void migrate(@NonNull final SupportSQLiteDatabase database) {
+            database.execSQL("CREATE TABLE IF NOT EXISTS `download` "
+                    + "(`id_key` TEXT NOT NULL, "
+                    + "`url_key` TEXT NOT NULL, "
+                    + "`creation_date` INTEGER NOT NULL, "
+                    + "`id` INTEGER NOT NULL, "
+                    + "`uri_value` TEXT NOT NULL, "
+                    + "PRIMARY KEY(`id`))");
         }
     };
 
