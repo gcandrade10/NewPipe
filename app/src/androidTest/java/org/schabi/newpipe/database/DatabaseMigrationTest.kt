@@ -128,6 +128,13 @@ class DatabaseMigrationTest {
             Migrations.MIGRATION_8_9
         )
 
+        testHelper.runMigrationsAndValidate(
+            AppDatabase.DATABASE_NAME,
+            Migrations.DB_VER_10,
+            true,
+            Migrations.MIGRATION_9_10
+        )
+
         val migratedDatabaseV3 = getMigratedDatabase()
         val listFromDB = migratedDatabaseV3.streamDAO().all.blockingFirst()
 

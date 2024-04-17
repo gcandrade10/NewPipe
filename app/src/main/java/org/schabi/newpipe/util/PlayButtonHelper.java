@@ -1,5 +1,7 @@
 package org.schabi.newpipe.util;
 
+import static org.schabi.newpipe.download.DownloadHelperKt.download;
+
 import android.content.Context;
 import android.widget.Toast;
 
@@ -47,6 +49,10 @@ public final class PlayButtonHelper {
         playlistControlBinding.playlistCtrlPlayBgButton.setOnClickListener(view -> {
             NavigationHelper.playOnBackgroundPlayer(activity, fragment.getPlayQueue(), false);
             showHoldToAppendToastIfNeeded(activity);
+        });
+
+        playlistControlBinding.playlistCtrlDownloadAllButton.setOnClickListener(view -> {
+            download(fragment.getPlayQueue(), activity);
         });
 
         // long click listener

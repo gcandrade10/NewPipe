@@ -57,6 +57,7 @@ import org.schabi.newpipe.extractor.stream.Stream;
 import org.schabi.newpipe.extractor.stream.StreamInfo;
 import org.schabi.newpipe.extractor.stream.SubtitlesStream;
 import org.schabi.newpipe.extractor.stream.VideoStream;
+import org.schabi.newpipe.local.download.DownloadRecordManager;
 import org.schabi.newpipe.settings.NewPipeSettings;
 import org.schabi.newpipe.streams.io.NoFileManagerSafeGuard;
 import org.schabi.newpipe.streams.io.StoredDirectoryHelper;
@@ -111,6 +112,9 @@ public class DownloadDialog extends DialogFragment
     @State
     int selectedSubtitleIndex = 0; // default to the first item
 
+    @State
+    Boolean useDefault = false;
+
     private StoredDirectoryHelper mainStorageAudio = null;
     private StoredDirectoryHelper mainStorageVideo = null;
     private DownloadManager downloadManager = null;
@@ -142,6 +146,8 @@ public class DownloadDialog extends DialogFragment
     private final ActivityResultLauncher<Intent> requestDownloadPickVideoFolderLauncher =
             registerForActivityResult(
                     new StartActivityForResult(), this::requestDownloadPickVideoFolderResult);
+
+    private DownloadRecordManager recordManager;
 
     /*//////////////////////////////////////////////////////////////////////////
     // Instance creation
@@ -198,6 +204,7 @@ public class DownloadDialog extends DialogFragment
     @Override
     public void onCreate(@Nullable final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        recordManager = new DownloadRecordManager(requireContext());
         if (DEBUG) {
             Log.d(TAG, "onCreate() called with: "
                     + "savedInstanceState = [" + savedInstanceState + "]");
@@ -234,6 +241,10 @@ public class DownloadDialog extends DialogFragment
                 askForSavePath = mgr.askForSavePath();
 
                 okButton.setEnabled(true);
+
+                if (useDefault) {
+                    prepareSelectedDownload();
+                }
 
                 context.unbindService(this);
             }
@@ -1140,9 +1151,29 @@ public class DownloadDialog extends DialogFragment
         DownloadManagerService.startMission(context, urls, storage, kind, threads,
                 currentInfo.getUrl(), psName, psArgs, nearLength, new ArrayList<>(recoveryInfo));
 
+        if (DEBUG) {
+            final String data = "" + currentInfo.getId() + " -> " + storage.getUri();
+            Log.d("GERRR", "continueSelectedDownload: " + data);
+        }
+
+        // TODO improve error handling
+        disposables.add(recordManager.insert(currentInfo.getId(), storage.getUri().toString(),
+                        currentInfo.getUrl()).onErrorComplete()
+                .subscribe(
+                        ignored -> {
+                            /* successful */
+                            dismiss();
+                        },
+                        error -> Log.e(TAG, "Register view failure: ", error)
+                ));
+
         Toast.makeText(context, getString(R.string.download_has_started),
                 Toast.LENGTH_SHORT).show();
 
         dismiss();
+    }
+
+    public void setDefaultValues(final boolean defaultB) {
+        useDefault = defaultB;
     }
 }
