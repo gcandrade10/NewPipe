@@ -183,6 +183,7 @@ public class DownloadManagerService extends Service {
         handlePreferenceChange(mPrefs, getString(R.string.downloads_cross_network));
         handlePreferenceChange(mPrefs, getString(R.string.downloads_maximum_retry));
         handlePreferenceChange(mPrefs, getString(R.string.downloads_queue_limit));
+        handlePreferenceChange(mPrefs, getString(R.string.downloads_use_default));
 
         mLock = new LockManager(this);
     }
@@ -326,6 +327,8 @@ public class DownloadManagerService extends Service {
         } else if (getString(R.string.download_path_video_key).equals(key)) {
             mManager.mMainStorageVideo = loadMainVideoStorage();
         } else if (getString(R.string.download_path_audio_key).equals(key)) {
+            mManager.mMainStorageAudio = loadMainAudioStorage();
+        } else if (key.equals(getString(R.string.downloads_use_default))) {
             mManager.mMainStorageAudio = loadMainAudioStorage();
         }
     }
