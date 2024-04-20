@@ -467,7 +467,10 @@ public final class Player implements PlaybackListener, Listener {
         }
 
         UIs.call(PlayerUi::setupAfterIntent);
-        NavigationHelper.sendPlayerStartedEvent(context);
+        NavigationHelper.sendPlayerStartedEvent(context,
+                playQueue.getItem().getTitle(),
+                playQueue.getItem().getUploader()
+                );
     }
 
     private void initUIsForCurrentPlayerType() {
@@ -637,7 +640,7 @@ public final class Player implements PlaybackListener, Listener {
         }
 
         if (playQueue != null) {
-            playQueueManager = new MediaSourceManager(this, playQueue);
+            playQueueManager = new MediaSourceManager(this, playQueue, context);
         }
     }
 

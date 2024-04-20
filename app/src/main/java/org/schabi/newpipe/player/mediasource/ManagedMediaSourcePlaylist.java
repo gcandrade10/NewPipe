@@ -42,8 +42,8 @@ public class ManagedMediaSourcePlaylist {
 
         return MediaItemTag
                 .from(internalSource.getMediaSource(index).getMediaItem())
-                .flatMap(tag -> tag.getMaybeExtras(ManagedMediaSource.class))
-                .orElse(null);
+                .flatMap(tag -> tag.getMaybeExtras(ManagedMediaSource.class)).orElseGet(() ->
+                        new LocalMediaSource(internalSource.getMediaSource(index)));
     }
 
     @NonNull
