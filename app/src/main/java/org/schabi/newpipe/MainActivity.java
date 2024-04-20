@@ -811,14 +811,14 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void openMiniPlayerIfMissing() {
+    private void openMiniPlayerIfMissing(final String title, final String artist) {
         final Fragment fragmentPlayer = getSupportFragmentManager()
                 .findFragmentById(R.id.fragment_player_holder);
         if (fragmentPlayer == null) {
             // We still don't have a fragment attached to the activity. It can happen when a user
             // started popup or background players without opening a stream inside the fragment.
             // Adding it in a collapsed state (only mini player will be visible).
-            NavigationHelper.showMiniPlayer(getSupportFragmentManager());
+            NavigationHelper.showMiniPlayer(getSupportFragmentManager(), title, artist);
         }
     }
 
@@ -832,7 +832,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (PlayerHolder.getInstance().isPlayerOpen()) {
             // if the player is already open, no need for a broadcast receiver
-            openMiniPlayerIfMissing();
+            openMiniPlayerIfMissing("title", "artist");
         } else {
             // listen for player start intent being sent around
             broadcastReceiver = new BroadcastReceiver() {
@@ -840,7 +840,9 @@ public class MainActivity extends AppCompatActivity {
                 public void onReceive(final Context context, final Intent intent) {
                     if (Objects.equals(intent.getAction(),
                             VideoDetailFragment.ACTION_PLAYER_STARTED)) {
-                        openMiniPlayerIfMissing();
+                        final String title = intent.getStringExtra("title");
+                        final String artist = intent.getStringExtra("artist");
+                        openMiniPlayerIfMissing(title, artist);
                         // At this point the player is added 100%, we can unregister. Other actions
                         // are useless since the fragment will not be removed after that.
                         unregisterReceiver(broadcastReceiver);

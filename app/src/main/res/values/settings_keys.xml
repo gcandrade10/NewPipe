@@ -421,6 +421,7 @@
     <string name="downloads_storage_ask">downloads_storage_ask</string>
     <string name="storage_use_saf">storage_use_saf</string>
     <string name="downloads_use_default">downloads_use_default</string>
+    <string name="check_downloads_first">check_downloads_first</string>
 
     <!-- FileName Downloads  -->
     <string name="settings_file_charset_key">file_rename_charset</string>
