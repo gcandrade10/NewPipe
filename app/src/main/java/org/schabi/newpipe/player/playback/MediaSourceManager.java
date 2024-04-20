@@ -1,18 +1,25 @@
 package org.schabi.newpipe.player.playback;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Handler;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.collection.ArraySet;
+import androidx.preference.PreferenceManager;
 
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
+import org.schabi.newpipe.R;
+import org.schabi.newpipe.database.download.entry.DownloadEntry;
 import org.schabi.newpipe.extractor.exceptions.ExtractionException;
+import org.schabi.newpipe.local.download.DownloadRecordManager;
 import org.schabi.newpipe.player.mediaitem.MediaItemTag;
 import org.schabi.newpipe.player.mediasource.FailedMediaSource;
 import org.schabi.newpipe.player.mediasource.LoadedMediaSource;
+import org.schabi.newpipe.player.mediasource.LocalMediaSource;
 import org.schabi.newpipe.player.mediasource.ManagedMediaSource;
 import org.schabi.newpipe.player.mediasource.ManagedMediaSourcePlaylist;
 import org.schabi.newpipe.player.playqueue.PlayQueue;
@@ -42,6 +49,10 @@ import static org.schabi.newpipe.player.mediasource.FailedMediaSource.MediaSourc
 import static org.schabi.newpipe.player.mediasource.FailedMediaSource.StreamInfoLoadException;
 import static org.schabi.newpipe.player.playqueue.PlayQueue.DEBUG;
 import static org.schabi.newpipe.util.ServiceHelper.getCacheExpirationMillis;
+
+import com.google.android.exoplayer2.MediaItem;
+import com.google.android.exoplayer2.source.ProgressiveMediaSource;
+import com.google.android.exoplayer2.upstream.DefaultDataSource;
 
 public class MediaSourceManager {
     @NonNull
@@ -125,11 +136,16 @@ public class MediaSourceManager {
 
     private final Handler removeMediaSourceHandler = new Handler();
 
+    @NonNull
+    Context context;
+
     public MediaSourceManager(@NonNull final PlaybackListener listener,
-                              @NonNull final PlayQueue playQueue) {
+                              @NonNull final PlayQueue playQueue,
+                              @NonNull final Context context) {
         this(listener, playQueue, 400L,
                 /*playbackNearEndGapMillis=*/TimeUnit.MILLISECONDS.convert(30, TimeUnit.SECONDS),
                 /*progressUpdateIntervalMillis*/TimeUnit.MILLISECONDS.convert(2, TimeUnit.SECONDS));
+        this.context = context;
     }
 
     private MediaSourceManager(@NonNull final PlaybackListener listener,
@@ -411,6 +427,38 @@ public class MediaSourceManager {
             }
 
             loadingItems.add(item);
+
+            // try with local first
+            final String checkDownloadsFirst = context.getString(R.string.check_downloads_first);
+            final SharedPreferences sharedPref =
+                    PreferenceManager.getDefaultSharedPreferences(context);
+            final Boolean checkDownloadsFirstValue =
+                    sharedPref.getBoolean(checkDownloadsFirst, true);
+
+            final DownloadRecordManager d = new DownloadRecordManager(context);
+            final DownloadEntry downloadEntry = d.getUriFromUrl(item.getUrl()).blockingGet();
+            if (checkDownloadsFirstValue && downloadEntry != null) {
+                final String audioUri = downloadEntry.getUriValue();
+
+                // Create a data source factory to provide the MediaSource with data.
+                final DefaultDataSource.Factory dataSourceFactory =
+                        new DefaultDataSource.Factory(context); // Use default user agent
+
+                final MediaItem mediaItem = new MediaItem.Builder()
+                        .setUri(audioUri)
+                        .setMediaId(item.getUrl())
+                        .setTag(audioUri)
+                        .build();
+
+                final ProgressiveMediaSource mediaSource =
+                        new ProgressiveMediaSource.Factory(dataSourceFactory)
+                                .createMediaSource(mediaItem);
+
+
+                onMediaSourceReceived(item, new LocalMediaSource(mediaSource));
+                return;
+            }
+
             final Disposable loader = getLoadedMediaSource(item)
                     .observeOn(AndroidSchedulers.mainThread())
                     /* No exception handling since getLoadedMediaSource guarantees nonnull return */
@@ -471,7 +519,7 @@ public class MediaSourceManager {
                 Log.d(TAG, "MediaSource - Updating index=[" + itemIndex + "] with "
                         + "title=[" + item.getTitle() + "] at url=[" + item.getUrl() + "]");
             }
-            playlist.update(itemIndex, mediaSource, removeMediaSourceHandler,
+             playlist.update(itemIndex, mediaSource, removeMediaSourceHandler,
                     this::maybeSynchronizePlayer);
         }
     }
