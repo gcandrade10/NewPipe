@@ -59,7 +59,7 @@ fun download(
 
     val useDefaultKey: String = activity.getString(R.string.downloads_use_default)
     val sharedPref = PreferenceManager.getDefaultSharedPreferences(activity)
-    val defaultValue = sharedPref.getBoolean(useDefaultKey, true)
+    val defaultValue = sharedPref.getBoolean(useDefaultKey, false)
 
     if (defaultValue) {
         try {
@@ -333,7 +333,7 @@ private fun continueSelectedDownload(
     val urls: Array<String?> = arrayOf(
         selectedStream.getUrl()
     )
-    val recoveryInfo: Array<MissionRecoveryInfo> = arrayOf(
+    val recoveryInfo: ArrayList<MissionRecoveryInfo> = arrayListOf(
         MissionRecoveryInfo(selectedStream)
     )
 
