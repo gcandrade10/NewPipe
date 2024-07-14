@@ -433,7 +433,7 @@ public class MediaSourceManager {
             final SharedPreferences sharedPref =
                     PreferenceManager.getDefaultSharedPreferences(context);
             final Boolean checkDownloadsFirstValue =
-                    sharedPref.getBoolean(checkDownloadsFirst, true);
+                    sharedPref.getBoolean(checkDownloadsFirst, false);
 
             final DownloadRecordManager d = new DownloadRecordManager(context);
             final DownloadEntry downloadEntry = d.getUriFromUrl(item.getUrl()).blockingGet();
