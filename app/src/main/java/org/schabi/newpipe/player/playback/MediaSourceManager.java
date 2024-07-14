@@ -17,6 +17,7 @@ import org.schabi.newpipe.database.download.entry.DownloadEntry;
 import org.schabi.newpipe.extractor.exceptions.ExtractionException;
 import org.schabi.newpipe.local.download.DownloadRecordManager;
 import org.schabi.newpipe.player.mediaitem.MediaItemTag;
+import org.schabi.newpipe.player.mediaitem.MediaTagImpl;
 import org.schabi.newpipe.player.mediasource.FailedMediaSource;
 import org.schabi.newpipe.player.mediasource.LoadedMediaSource;
 import org.schabi.newpipe.player.mediasource.LocalMediaSource;
@@ -447,7 +448,11 @@ public class MediaSourceManager {
                 final MediaItem mediaItem = new MediaItem.Builder()
                         .setUri(audioUri)
                         .setMediaId(item.getUrl())
-                        .setTag(audioUri)
+                        .setTag(
+                                new MediaTagImpl(
+                                        downloadEntry.getName(),
+                                        downloadEntry.getUploaderName())
+                        )
                         .build();
 
                 final ProgressiveMediaSource mediaSource =

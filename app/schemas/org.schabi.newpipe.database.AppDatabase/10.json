@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 10,
-    "identityHash": "8401456768674521d2a28a221a37406c",
+    "identityHash": "97b77504ce430e914b8e8628f548c03c",
     "entities": [
       {
         "tableName": "subscriptions",
@@ -722,7 +722,7 @@
       },
       {
         "tableName": "download",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`creation_date` INTEGER NOT NULL, `id_key` TEXT NOT NULL, `url_key` TEXT NOT NULL, `uri_value` TEXT NOT NULL, `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`creation_date` INTEGER NOT NULL, `id_key` TEXT NOT NULL, `url_key` TEXT NOT NULL, `uri_value` TEXT NOT NULL, `name` TEXT NOT NULL, `uploader_name` TEXT NOT NULL, `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)",
         "fields": [
           {
             "fieldPath": "creationDate",
@@ -749,6 +749,18 @@
             "notNull": true
           },
           {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "uploaderName",
+            "columnName": "uploader_name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
             "fieldPath": "id",
             "columnName": "id",
             "affinity": "INTEGER",
@@ -768,7 +780,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8401456768674521d2a28a221a37406c')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '97b77504ce430e914b8e8628f548c03c')"
     ]
   }
 }

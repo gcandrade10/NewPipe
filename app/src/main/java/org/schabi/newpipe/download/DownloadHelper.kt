@@ -353,8 +353,11 @@ private fun continueSelectedDownload(
 
     val disposables = CompositeDisposable()
 
+    val name = currentInfo.name
+    val uploaderName = currentInfo.uploaderName
+
     disposables.add(
-        recordManager.insert(currentInfo.id, storage.uri.toString(), currentInfo.url).onErrorComplete()
+        recordManager.insert(currentInfo.id, storage.uri.toString(), currentInfo.url, name, uploaderName).onErrorComplete()
             .subscribe(
                 { ignored: Long? ->
                     /* successful */
