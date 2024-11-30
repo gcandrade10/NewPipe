@@ -320,6 +320,16 @@ class DatabaseMigrationTest {
         assertEquals(-1, remoteListFromDB[1].displayIndex)
     }
 
+    @Test
+    fun migrateDatabaseFrom9to10() {
+        val databaseInV9 = testHelper.createDatabase(AppDatabase.DATABASE_NAME, Migrations.DB_VER_9)
+
+        testHelper.runMigrationsAndValidate(
+            AppDatabase.DATABASE_NAME, Migrations.DB_VER_9,
+            true, Migrations.MIGRATION_9_10
+        )
+    }
+
     private fun getMigratedDatabase(): AppDatabase {
         val database: AppDatabase = Room.databaseBuilder(
             ApplicationProvider.getApplicationContext(),

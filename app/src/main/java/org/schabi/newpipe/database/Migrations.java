@@ -312,6 +312,8 @@ public final class Migrations {
                     + "`creation_date` INTEGER NOT NULL, "
                     + "`id` INTEGER NOT NULL, "
                     + "`uri_value` TEXT NOT NULL, "
+                    + "`name` TEXT NOT NULL, "
+                    + "`uploader_name` TEXT NOT NULL, "
                     + "PRIMARY KEY(`id`))");
         }
     };
