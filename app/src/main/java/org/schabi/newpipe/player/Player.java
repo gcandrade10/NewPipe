@@ -467,10 +467,12 @@ public final class Player implements PlaybackListener, Listener {
         }
 
         UIs.call(PlayerUi::setupAfterIntent);
-        NavigationHelper.sendPlayerStartedEvent(context,
-                playQueue.getItem().getTitle(),
-                playQueue.getItem().getUploader()
-                );
+        if (playQueue != null) {
+            NavigationHelper.sendPlayerStartedEvent(context,
+                    playQueue.getItem().getTitle(),
+                    playQueue.getItem().getUploader()
+            );
+        }
     }
 
     private void initUIsForCurrentPlayerType() {
