@@ -1,5 +1,6 @@
 package org.schabi.newpipe.fragments.list.channel;
 
+import static org.schabi.newpipe.download.DownloadHelperKt.download;
 import static org.schabi.newpipe.ktx.TextViewUtils.animateTextColor;
 import static org.schabi.newpipe.ktx.ViewUtils.animate;
 import static org.schabi.newpipe.ktx.ViewUtils.animateBackgroundColor;
@@ -489,6 +490,9 @@ public class ChannelVideosFragment extends BaseListInfoFragment<StreamInfoItem, 
         playlistControlBinding.playlistCtrlPlayBgButton.setOnLongClickListener(view -> {
             NavigationHelper.enqueueOnPlayer(activity, getPlayQueue(), PlayerType.AUDIO);
             return true;
+        });
+        playlistControlBinding.playlistCtrlDownloadAllButton.setOnClickListener(view -> {
+            download(getPlayQueue(), activity);
         });
     }
 

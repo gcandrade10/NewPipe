@@ -28,6 +28,8 @@ public final class Migrations {
     public static final int DB_VER_8 = 8;
     public static final int DB_VER_9 = 9;
 
+    public static final int DB_VER_100 = 100;
+
     private static final String TAG = Migrations.class.getName();
     public static final boolean DEBUG = MainActivity.DEBUG;
 
@@ -364,6 +366,19 @@ public final class Migrations {
                     + "ON `remote_playlists` (`name`)");
             database.execSQL("CREATE UNIQUE INDEX `index_remote_playlists_service_id_url` "
                     + "ON `remote_playlists` (`service_id`, `url`)");
+        }
+    };
+
+    public static final Migration MIGRATION_6_100 = new Migration(DB_VER_6, DB_VER_100) {
+        @Override
+        public void migrate(@NonNull final SupportSQLiteDatabase database) {
+            database.execSQL("CREATE TABLE IF NOT EXISTS `download` "
+                    + "(`id_key` TEXT NOT NULL, "
+                    + "`url_key` TEXT NOT NULL, "
+                    + "`creation_date` INTEGER NOT NULL, "
+                    + "`id` INTEGER NOT NULL, "
+                    + "`uri_value` TEXT NOT NULL, "
+                    + "PRIMARY KEY(`id`))");
         }
     };
 

@@ -61,6 +61,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static org.schabi.newpipe.download.DownloadHelperKt.download;
 import static org.schabi.newpipe.ktx.ViewUtils.animate;
 import static org.schabi.newpipe.util.SparseItemUtil.fetchStreamInfoAndSaveToDatabase;
 import static org.schabi.newpipe.util.SparseItemUtil.fetchStreamInfoAndSaveToDatabaseWithoutToast;
@@ -305,6 +306,7 @@ public class LocalPlaylistFragment extends BaseLocalListFragment<List<PlaylistSt
             playlistControlBinding.playlistCtrlPlayBgButton.setOnClickListener(null);
             playlistControlBinding.playlistCtrlPlayAllButton.setOnClickListener(null);
             playlistControlBinding.playlistCtrlPlayPopupButton.setOnClickListener(null);
+            playlistControlBinding.playlistCtrlDownloadAllButton.setOnClickListener(null);
 
             headerBinding = null;
             playlistControlBinding = null;
@@ -715,6 +717,10 @@ public class LocalPlaylistFragment extends BaseLocalListFragment<List<PlaylistSt
         playlistControlBinding.playlistCtrlPlayBgButton.setOnLongClickListener(view -> {
             NavigationHelper.enqueueOnPlayer(activity, getPlayQueue(), PlayerType.AUDIO);
             return true;
+        });
+
+        playlistControlBinding.playlistCtrlDownloadAllButton.setOnClickListener(view -> {
+            download(getPlayQueue(), activity);
         });
 
         hideLoading();

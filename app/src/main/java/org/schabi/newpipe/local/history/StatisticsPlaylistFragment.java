@@ -1,5 +1,7 @@
 package org.schabi.newpipe.local.history;
 
+import static org.schabi.newpipe.download.DownloadHelperKt.download;
+
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -252,6 +254,7 @@ public class StatisticsPlaylistFragment
             playlistControlBinding.playlistCtrlPlayBgButton.setOnClickListener(null);
             playlistControlBinding.playlistCtrlPlayAllButton.setOnClickListener(null);
             playlistControlBinding.playlistCtrlPlayPopupButton.setOnClickListener(null);
+            playlistControlBinding.playlistCtrlDownloadAllButton.setOnClickListener(null);
 
             headerBinding = null;
             playlistControlBinding = null;

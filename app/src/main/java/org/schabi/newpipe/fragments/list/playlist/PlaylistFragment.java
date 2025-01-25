@@ -1,5 +1,6 @@
 package org.schabi.newpipe.fragments.list.playlist;
 
+import static org.schabi.newpipe.download.DownloadHelperKt.download;
 import static org.schabi.newpipe.extractor.ListExtractor.ITEM_COUNT_INFINITE;
 import static org.schabi.newpipe.ktx.ViewUtils.animate;
 import static org.schabi.newpipe.ktx.ViewUtils.animateHideRecyclerViewAllowingScrolling;
@@ -376,6 +377,9 @@ public class PlaylistFragment extends BaseListInfoFragment<StreamInfoItem, Playl
         playlistControlBinding.playlistCtrlPlayBgButton.setOnLongClickListener(view -> {
             NavigationHelper.enqueueOnPlayer(activity, getPlayQueue(), PlayerType.AUDIO);
             return true;
+        });
+        playlistControlBinding.playlistCtrlDownloadAllButton.setOnClickListener(view -> {
+            download(getPlayQueue(), activity);
         });
     }
 
