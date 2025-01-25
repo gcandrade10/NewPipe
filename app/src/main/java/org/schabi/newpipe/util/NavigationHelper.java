@@ -274,6 +274,7 @@ public final class NavigationHelper {
         intent.putExtra(Intent.EXTRA_TITLE, name);
         intent.putExtra("title", name);
         intent.putExtra("artist", artist);
+        intent.putExtra("thumbnailUrl", artist);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
         resolveActivityOrAskToInstall(context, intent);
@@ -350,15 +351,27 @@ public final class NavigationHelper {
         context.sendBroadcast(new Intent(VideoDetailFragment.ACTION_SHOW_MAIN_PLAYER));
     }
 
-    public static void sendPlayerStartedEvent(final Context context) {
-        context.sendBroadcast(new Intent(VideoDetailFragment.ACTION_PLAYER_STARTED));
+    public static void sendPlayerStartedEvent(final Context context,
+                                              final String title,
+                                              final String artist,
+                                              final String thumbnailUrl
+    ) {
+        context.sendBroadcast(new
+                Intent(VideoDetailFragment.ACTION_PLAYER_STARTED)
+                .putExtra("title", title)
+                .putExtra("artist", artist)
+                .putExtra("thumbnailUrl", thumbnailUrl)
+        );
     }
-
-    public static void showMiniPlayer(final FragmentManager fragmentManager) {
+    public static void showMiniPlayer(final FragmentManager fragmentManager,
+                                      final String title,
+                                      final String artist,
+                                      final String thumbnailUrl) {
         final VideoDetailFragment instance = VideoDetailFragment.getInstanceInCollapsedState();
         defaultTransaction(fragmentManager)
                 .replace(R.id.fragment_player_holder, instance)
-                .runOnCommit(() -> sendPlayerStartedEvent(instance.requireActivity()))
+                .runOnCommit(() -> sendPlayerStartedEvent(instance.requireActivity(),
+                        title, artist, thumbnailUrl))
                 .commitAllowingStateLoss();
     }
 

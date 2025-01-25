@@ -1544,6 +1544,10 @@ public final class VideoDetailFragment
                         break;
                     case ACTION_PLAYER_STARTED:
                         // If the state is not hidden we don't need to show the mini player
+                        updateOverlayData(
+                                intent.getStringExtra("title"),
+                                intent.getStringExtra("artist"),
+                                intent.getStringExtra("thumbnailUrl"));
                         if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_HIDDEN) {
                             bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
                         }

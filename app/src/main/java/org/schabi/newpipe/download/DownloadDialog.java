@@ -1119,9 +1119,14 @@ public class DownloadDialog extends DialogFragment
             final String data = "" + currentInfo.getId() + " -> " + storage.getUri();
             Log.d("GERRR", "continueSelectedDownload: " + data);
         }
+
+        final String name = currentInfo.getName();
+        final String uploaderName = currentInfo.getUploaderName();
+        final String thumbnailUrl = currentInfo.getThumbnailUrl();
+
         // TODO improve error handling
         disposables.add(recordManager.insert(currentInfo.getId(), storage.getUri().toString(),
-                        currentInfo.getUrl()).onErrorComplete()
+                        currentInfo.getUrl(), name, uploaderName, thumbnailUrl).onErrorComplete()
                 .subscribe(
                         ignored -> {
                             /* successful */
