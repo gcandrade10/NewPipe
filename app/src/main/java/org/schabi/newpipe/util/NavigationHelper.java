@@ -352,9 +352,9 @@ public final class NavigationHelper {
     }
 
     public static void sendPlayerStartedEvent(final Context context,
-                                              final String title,
-                                              final String artist,
-                                              final String thumbnailUrl
+                                              @Nullable final String title,
+                                              @Nullable String artist,
+                                              @Nullable String thumbnailUrl
     ) {
         context.sendBroadcast(new
                 Intent(VideoDetailFragment.ACTION_PLAYER_STARTED)

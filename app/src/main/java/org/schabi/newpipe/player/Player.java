@@ -236,15 +236,20 @@ public final class Player implements
     //////////////////////////////////////////////////////////////////////////*/
 
     // play queue might be null e.g. while player is starting
-    @Nullable private PlayQueue playQueue;
+    @Nullable
+    private PlayQueue playQueue;
     private PlayQueueAdapter playQueueAdapter;
     private StreamSegmentAdapter segmentAdapter;
 
-    @Nullable private MediaSourceManager playQueueManager;
+    @Nullable
+    private MediaSourceManager playQueueManager;
 
-    @Nullable private PlayQueueItem currentItem;
-    @Nullable private MediaItemTag currentMetadata;
-    @Nullable private Bitmap currentThumbnail;
+    @Nullable
+    private PlayQueueItem currentItem;
+    @Nullable
+    private MediaItemTag currentMetadata;
+    @Nullable
+    private Bitmap currentThumbnail;
 
     /*//////////////////////////////////////////////////////////////////////////
     // Player
@@ -253,14 +258,20 @@ public final class Player implements
     private ExoPlayer simpleExoPlayer;
     private AudioReactor audioReactor;
     private MediaSessionManager mediaSessionManager;
-    @Nullable private SurfaceHolderCallback surfaceHolderCallback;
+    @Nullable
+    private SurfaceHolderCallback surfaceHolderCallback;
 
-    @NonNull private final DefaultTrackSelector trackSelector;
-    @NonNull private final LoadController loadController;
-    @NonNull private final DefaultRenderersFactory renderFactory;
+    @NonNull
+    private final DefaultTrackSelector trackSelector;
+    @NonNull
+    private final LoadController loadController;
+    @NonNull
+    private final DefaultRenderersFactory renderFactory;
 
-    @NonNull private final VideoPlaybackResolver videoResolver;
-    @NonNull private final AudioPlaybackResolver audioResolver;
+    @NonNull
+    private final VideoPlaybackResolver videoResolver;
+    @NonNull
+    private final AudioPlaybackResolver audioResolver;
 
     public final MainPlayer service; //TODO try to remove and replace everything with context
 
@@ -331,8 +342,10 @@ public final class Player implements
     public static final int ONGOING_PLAYBACK_WINDOW_FLAGS = IDLE_WINDOW_FLAGS
             | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
 
-    @Nullable private WindowManager.LayoutParams popupLayoutParams; // null if player is not popup
-    @Nullable private final WindowManager windowManager;
+    @Nullable
+    private WindowManager.LayoutParams popupLayoutParams; // null if player is not popup
+    @Nullable
+    private final WindowManager windowManager;
 
     /*//////////////////////////////////////////////////////////////////////////
     // Gestures
@@ -354,22 +367,29 @@ public final class Player implements
     private PlayerEventListener activityListener;
     private ContentObserver settingsContentObserver;
 
-    @NonNull private final SerialDisposable progressUpdateDisposable = new SerialDisposable();
-    @NonNull private final CompositeDisposable databaseUpdateDisposable = new CompositeDisposable();
+    @NonNull
+    private final SerialDisposable progressUpdateDisposable = new SerialDisposable();
+    @NonNull
+    private final CompositeDisposable databaseUpdateDisposable = new CompositeDisposable();
 
     /*//////////////////////////////////////////////////////////////////////////
     // Utils
     //////////////////////////////////////////////////////////////////////////*/
 
-    @NonNull private final Context context;
-    @NonNull private final SharedPreferences prefs;
-    @NonNull private final HistoryRecordManager recordManager;
+    @NonNull
+    private final Context context;
+    @NonNull
+    private final SharedPreferences prefs;
+    @NonNull
+    private final HistoryRecordManager recordManager;
 
-    @NonNull private final SeekbarPreviewThumbnailHolder seekbarPreviewThumbnailHolder =
+    @NonNull
+    private final SeekbarPreviewThumbnailHolder seekbarPreviewThumbnailHolder =
             new SeekbarPreviewThumbnailHolder();
 
     private Future<?> enqueueTimer;
-    private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(2);;
+    private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(2);
+    ;
 
 
     /*//////////////////////////////////////////////////////////////////////////
@@ -390,7 +410,6 @@ public final class Player implements
     public float longPressSpeedingFactor = 1.0f;
 
     private PlayerDataSource dataSource;
-
 
 
     public Player(@NonNull final MainPlayer service) {
@@ -604,12 +623,12 @@ public final class Player implements
                             v.getPaddingTop(),
                             v.getPaddingRight(),
                             v.getPaddingBottom());
-                    if(v.getPaddingLeft() != 0 || v.getPaddingTop() != 0
-                            || v.getPaddingRight() != 0 || v.getPaddingBottom() != 0){
+                    if (v.getPaddingLeft() != 0 || v.getPaddingTop() != 0
+                            || v.getPaddingRight() != 0 || v.getPaddingBottom() != 0) {
                         binding.playButtons.setPadding(
-                                -v.getPaddingLeft(), -v.getPaddingTop(),-v.getPaddingRight(),-v.getPaddingBottom());
+                                -v.getPaddingLeft(), -v.getPaddingTop(), -v.getPaddingRight(), -v.getPaddingBottom());
                         binding.loadingPanelWrapper.setPadding(
-                                -v.getPaddingLeft(), -v.getPaddingTop(),-v.getPaddingRight(),-v.getPaddingBottom());
+                                -v.getPaddingLeft(), -v.getPaddingTop(), -v.getPaddingRight(), -v.getPaddingBottom());
                     } else {
                         binding.playButtons.setPadding(0, 0, 0, 0);
                         binding.loadingPanelWrapper.setPadding(0, 0, 0, 0);
@@ -724,7 +743,7 @@ public final class Player implements
             playQueue.append(newQueue.getStreams());
             return;
 
-        // Resolve enqueue next intents
+            // Resolve enqueue next intents
         } else if (intent.getBooleanExtra(ENQUEUE_NEXT, false) && playQueue != null) {
             final int currentIndex = playQueue.getIndex();
             playQueue.append(newQueue.getStreams());
@@ -856,11 +875,16 @@ public final class Player implements
                 pause();
             }
         }
-        NavigationHelper.sendPlayerStartedEvent(context,
-                playQueue.getItem().getTitle(),
-                playQueue.getItem().getUploader(),
-                playQueue.getItem().getThumbnailUrl()
-        );
+        String title = null;
+        String uploader = null;
+        String thumbnailUrl = null;
+        if (playQueue != null && playQueue.getItem() != null) {
+            PlayQueueItem item = playQueue.getItem();
+            title = item.getTitle();
+            uploader = item.getUploader();
+            thumbnailUrl = item.getThumbnailUrl();
+        }
+        NavigationHelper.sendPlayerStartedEvent(context, title, uploader, thumbnailUrl);
     }
 
     /**
@@ -954,11 +978,11 @@ public final class Player implements
             playQueueAdapter.unsetSelectedListener();
             playQueueAdapter.dispose();
         }
-        if(bcPlayer != null){
+        if (bcPlayer != null) {
             bcPlayer.disconnect();
             clearBCPlayer();
         }
-        if(enqueueTimer != null){
+        if (enqueueTimer != null) {
             enqueueTimer.cancel(true);
         }
         dataSource.disconnectWebSocketClients();
@@ -991,8 +1015,8 @@ public final class Player implements
         final long windowPos = simpleExoPlayer.getCurrentPosition();
         final long duration = simpleExoPlayer.getDuration();
 
-        final long newPos =  Math.max(0, Math.min(windowPos, duration));
-        if(newPos > 0) {
+        final long newPos = Math.max(0, Math.min(windowPos, duration));
+        if (newPos > 0) {
             setRecovery(queuePos, newPos);
         }
     }
@@ -1311,7 +1335,7 @@ public final class Player implements
                 break;
             case VideoDetailFragment.ACTION_SEEK_TO:
                 seekTo(intent.getIntExtra("Timestamp", 0) * 1000L);
-                if(wasPlaying){
+                if (wasPlaying) {
                     simpleExoPlayer.play();
                 }
                 break;
@@ -1558,6 +1582,7 @@ public final class Player implements
 
     /**
      * Changes the size of the popup based on the width.
+     *
      * @param width the new width, height is calculated with
      *              {@link PlayerHelper#getMinimumVideoHeight(float)}
      */
@@ -1787,6 +1812,7 @@ public final class Player implements
     public void triggerProgressUpdate() {
         triggerProgressUpdate(false);
     }
+
     private void triggerProgressUpdate(final boolean isRewind) {
         if (exoPlayerIsNull()) {
             return;
@@ -2122,7 +2148,6 @@ public final class Player implements
     //endregion
 
 
-
     /*//////////////////////////////////////////////////////////////////////////
     // Playback states
     //////////////////////////////////////////////////////////////////////////*/
@@ -2190,11 +2215,11 @@ public final class Player implements
     @Override // exoplayer listener
     public void onIsLoadingChanged(final boolean isLoading) {
         if (!isLoading) {
-            if(currentState == STATE_PAUSED && isProgressLoopRunning()){
+            if (currentState == STATE_PAUSED && isProgressLoopRunning()) {
                 stopProgressLoop();
             }
         } else {
-            if(!isProgressLoopRunning()){
+            if (!isProgressLoopRunning()) {
                 startProgressLoop();
             }
         }
@@ -2251,14 +2276,14 @@ public final class Player implements
                 onBuffering();
                 break;
             case STATE_PAUSED:
-                if(enqueueTimer != null){
+                if (enqueueTimer != null) {
                     enqueueTimer.cancel(true);
                 }
                 onPaused();
                 pauseBCPlayer();
                 break;
             case STATE_PAUSED_SEEK:
-                if(enqueueTimer != null){
+                if (enqueueTimer != null) {
                     enqueueTimer.cancel(true);
                 }
                 onPausedSeek();
@@ -2299,9 +2324,9 @@ public final class Player implements
                     .getMediaCapabilities()
                     .contains(StreamingService.ServiceInfo.MediaCapability.BULLET_COMMENTS)
                     && !audioPlayerSelected()) {
-                if(bcPlayer!= null){
-                    if(utils.DetimestampedEqual(bcPlayer.getUrl(), currentMetadata.getStreamUrl())){
-                        return ;
+                if (bcPlayer != null) {
+                    if (utils.DetimestampedEqual(bcPlayer.getUrl(), currentMetadata.getStreamUrl())) {
+                        return;
                     }
                     bcPlayer.disconnect();
                 }
@@ -2325,8 +2350,8 @@ public final class Player implements
             binding.switchCommentsVisibility.setVisibility(View.GONE);
         } else {
             binding.switchCommentsVisibility.setVisibility(View.VISIBLE);
-            binding.switchCommentsVisibility.setImageDrawable(isBCPlayerVisible?AppCompatResources.getDrawable(context,
-                    R.drawable.ic_bullet_comment_enabled):AppCompatResources.getDrawable(context,
+            binding.switchCommentsVisibility.setImageDrawable(isBCPlayerVisible ? AppCompatResources.getDrawable(context,
+                    R.drawable.ic_bullet_comment_enabled) : AppCompatResources.getDrawable(context,
                     R.drawable.ic_bullet_comment_disabled));
         }
     }
@@ -2345,16 +2370,16 @@ public final class Player implements
                 .observeOn(AndroidSchedulers.mainThread())
                 .map(s -> {
                     Duration ret = getCurrentPositionDuration();
-                    if(currentItem!= null && currentItem.getStartAt() != -1 && currentItem.getStreamType() == StreamType.LIVE_STREAM){
+                    if (currentItem != null && currentItem.getStartAt() != -1 && currentItem.getStreamType() == StreamType.LIVE_STREAM) {
                         ret = Duration.ofMillis(new Date().getTime() - currentItem.getStartAt());
                     }
-                    if(ret == null){
+                    if (ret == null) {
                         return Duration.ofMillis(-1);
                     }
                     return ret;
                 })
-                .subscribe(s ->  {
-                            if(isPlaying() && !audioPlayerSelected()){
+                .subscribe(s -> {
+                            if (isPlaying() && !audioPlayerSelected()) {
                                 bcPlayer.drawComments(s.plus(bcPlayer.INTERVAL));
                             }
                         },
@@ -2403,8 +2428,8 @@ public final class Player implements
     private void onSwitchBCPlayerVisibilityClicked() {
         isBCPlayerVisible = !isBCPlayerVisible;
         prefs.edit().putBoolean("isBCPlayerVisible", isBCPlayerVisible).apply();
-        binding.switchCommentsVisibility.setImageDrawable(isBCPlayerVisible?AppCompatResources.getDrawable(context,
-                R.drawable.ic_bullet_comment_enabled):AppCompatResources.getDrawable(context,
+        binding.switchCommentsVisibility.setImageDrawable(isBCPlayerVisible ? AppCompatResources.getDrawable(context,
+                R.drawable.ic_bullet_comment_enabled) : AppCompatResources.getDrawable(context,
                 R.drawable.ic_bullet_comment_disabled));
         Log.i(TAG, "BulletCommentPlayer visibility changed to " + isBCPlayerVisible);
         if (isBCPlayerVisible) {
@@ -2466,10 +2491,10 @@ public final class Player implements
 
         updateStreamRelatedViews();
 
-        if(getCurrentStreamInfo().isPresent()){
+        if (getCurrentStreamInfo().isPresent()) {
             StreamInfo streamInfo = getCurrentStreamInfo().get();
-            if(streamInfo.isRoundPlayStream() && (
-                    enqueueTimer == null || enqueueTimer.isDone() || enqueueTimer.isCancelled())){
+            if (streamInfo.isRoundPlayStream() && (
+                    enqueueTimer == null || enqueueTimer.isDone() || enqueueTimer.isCancelled())) {
                 enqueueTimer = executor.schedule(() -> maybeAutoQueueNextStream(streamInfo, true),
                         Math.max(simpleExoPlayer.getDuration()
                                 - simpleExoPlayer.getCurrentPosition() - 1000, 0), MILLISECONDS);
@@ -2936,8 +2961,9 @@ public final class Player implements
      * For any error above that is <b>not</b> explicitly <b>catchable</b>, the player will
      * create a notification so users are aware.
      * </ul>
+     *
      * @see com.google.android.exoplayer2.Player.Listener#onPlayerError(PlaybackException)
-     * */
+     */
     // Any error code not explicitly covered here are either unrelated to NewPipe use case
     // (e.g. DRM) or not recoverable (e.g. Decoder error). In both cases, the player should
     // shutdown.
@@ -3047,6 +3073,7 @@ public final class Player implements
 
     /**
      * Sets the current duration into the corresponding elements.
+     *
      * @param currentProgress
      */
     private void updatePlayBackElementsCurrentDuration(final int currentProgress) {
@@ -3054,7 +3081,7 @@ public final class Player implements
         if (currentState != STATE_PAUSED_SEEK) {
             binding.playbackSeekBar.setProgress(currentProgress);
         }
-        if(currentItem!= null && currentItem.getStartAt() != -1 && currentItem.getStreamType() == StreamType.LIVE_STREAM){
+        if (currentItem != null && currentItem.getStartAt() != -1 && currentItem.getStreamType() == StreamType.LIVE_STREAM) {
             binding.playbackCurrentTime.setText(getTimeString((int) (new Date().getTime() - currentItem.getStartAt())));
         } else {
             binding.playbackCurrentTime.setText(getTimeString(currentProgress));
@@ -3328,14 +3355,14 @@ public final class Player implements
 
         databaseUpdateDisposable
                 .add(recordManager.saveStreamState(getCurrentStreamInfo().get(), progressMillis)
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnError(e -> {
-                    if (DEBUG) {
-                        e.printStackTrace();
-                    }
-                })
-                .onErrorComplete()
-                .subscribe());
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .doOnError(e -> {
+                            if (DEBUG) {
+                                e.printStackTrace();
+                            }
+                        })
+                        .onErrorComplete()
+                        .subscribe());
     }
 
     public void saveStreamProgressState() {
@@ -3380,11 +3407,11 @@ public final class Player implements
 
         binding.titleTextView.setText(info.getName());
         binding.channelTextView.setText(info.getUploaderName());
-        if(currentMetadata.getServiceId() != ServiceList.YouTube.getServiceId()){
+        if (currentMetadata.getServiceId() != ServiceList.YouTube.getServiceId()) {
             binding.switchSponsorBlocking.setVisibility(View.GONE);
         }
         String sponsorBlockModePrefString = prefs.getString(context.getString(R.string.pref_sponsorblock_mode_key), "ENABLED");
-        switch (sponsorBlockModePrefString){
+        switch (sponsorBlockModePrefString) {
             case "ENABLED":
                 sponsorBlockMode = SponsorBlockMode.ENABLED;
                 break;
@@ -3482,7 +3509,7 @@ public final class Player implements
             return;
         }
         List<StreamInfoItem> partitions = info.getPartitions();
-        if(partitions.size() > 1 && prefs.getBoolean(context.getString(R.string.auto_queue_partition_key), true)
+        if (partitions.size() > 1 && prefs.getBoolean(context.getString(R.string.auto_queue_partition_key), true)
                 && playQueue.getStreams().stream()
                 .map(result -> result.getUrl().split("p="))
                 .filter(parts -> parts.length == 2)
@@ -3491,9 +3518,9 @@ public final class Player implements
                 .filter(result -> !Arrays.equals(result, new String[]{"", "-1"}))
                 .isPresent()
                 && playQueue.getIndex() == playQueue.size() - 1
-        ){
+        ) {
             int p = Integer.parseInt(info.getUrl().split(Pattern.quote("?p="))[1].split("&")[0]);
-            if(partitions.size() > p){
+            if (partitions.size() > p) {
                 playQueue.append(getAutoQueuedSinglePlayQueue(partitions.get(p)).getStreams());
             }
         }
@@ -3504,7 +3531,7 @@ public final class Player implements
         }
 
         boolean dontAutoQueueLongVideos = prefs.getBoolean(
-            context.getString(R.string.dont_auto_queue_long_key), true
+                context.getString(R.string.dont_auto_queue_long_key), true
         );
 
         // auto queue when starting playback on the last item when not repeating
@@ -3724,7 +3751,7 @@ public final class Player implements
     @Nullable
     public MediaSource sourceOf(final PlayQueueItem item, final StreamInfo info) {
         if (audioPlayerSelected()) {
-            return Optional.ofNullable(audioResolver.resolve(info)).orElse(videoResolver.resolve(info)) ;
+            return Optional.ofNullable(audioResolver.resolve(info)).orElse(videoResolver.resolve(info));
         }
 
         if (isAudioOnly && videoResolver.getStreamSourceType().orElse(
@@ -3733,7 +3760,7 @@ public final class Player implements
             // If the current info has only video streams with audio and if the stream is played as
             // audio, we need to use the audio resolver, otherwise the video stream will be played
             // in background.
-            return Optional.ofNullable(audioResolver.resolve(info)).orElse(videoResolver.resolve(info)) ;
+            return Optional.ofNullable(audioResolver.resolve(info)).orElse(videoResolver.resolve(info));
         }
 
         // Even if the stream is played in background, we need to use the video resolver if the
@@ -4169,6 +4196,7 @@ public final class Player implements
 
     /**
      * Manages the controls after a click occurred on the player UI.
+     *
      * @param v – The view that was clicked
      */
     public void manageControlsAfterOnClick(@NonNull final View v) {
@@ -4334,11 +4362,11 @@ public final class Player implements
     private void setupScreenRotationButton() {
         binding.screenRotationButton.setVisibility(videoPlayerSelected()
                 && (globalScreenOrientationLocked(context) || isVerticalVideo
-                        || DeviceUtils.isTablet(context))
+                || DeviceUtils.isTablet(context))
                 ? View.VISIBLE : View.GONE);
         binding.screenRotationButton.setImageDrawable(AppCompatResources.getDrawable(context,
                 isFullscreen ? R.drawable.ic_fullscreen_exit
-                : R.drawable.ic_fullscreen));
+                        : R.drawable.ic_fullscreen));
     }
 
     private void setResizeMode(@AspectRatioFrameLayout.ResizeMode final int resizeMode) {
@@ -4561,7 +4589,8 @@ public final class Player implements
                     setRecovery();
                     NavigationHelper.playOnPopupPlayer(getParentActivity(), playQueue, true);
                     break;
-                case MINIMIZE_ON_EXIT_MODE_NONE: default:
+                case MINIMIZE_ON_EXIT_MODE_NONE:
+                default:
                     pause();
                     break;
             }
@@ -4726,7 +4755,7 @@ public final class Player implements
         // because the stream source will be probably the same as the current played
         if (sourceType == SourceType.VIDEO_WITH_SEPARATED_AUDIO
                 || (sourceType == SourceType.VIDEO_WITH_AUDIO_OR_AUDIO_ONLY
-                    && isNullOrEmpty(streamInfo.getAudioStreams()))) {
+                && isNullOrEmpty(streamInfo.getAudioStreams()))) {
             // It's not needed to reload the play queue manager only if the content's stream type
             // is a video stream or a live stream
             return streamType != StreamType.VIDEO_STREAM && streamType != StreamType.LIVE_STREAM;
@@ -5039,6 +5068,7 @@ public final class Player implements
 
         setBlockSponsorsButton(binding.switchSponsorBlocking);
     }
+
     public void onBlockingSponsorsButtonLongClicked() {
         if (DEBUG) {
             Log.d(TAG, "onBlockingSponsorsButtonLongClicked() called");
@@ -5109,7 +5139,7 @@ public final class Player implements
 
     /**
      * Get the video renderer index of the current playing stream.
-     *
+     * <p>
      * This method returns the video renderer index of the current
      * {@link MappingTrackSelector.MappedTrackInfo} or {@link #RENDERER_UNAVAILABLE} if the current
      * {@link MappingTrackSelector.MappedTrackInfo} is null or if there is no video renderer index.
@@ -5134,6 +5164,7 @@ public final class Player implements
                 // No video renderer index with at least one track found: return unavailable index
                 .orElse(RENDERER_UNAVAILABLE);
     }
+
     public void setLongPressSpeedingEnabled(boolean enabled) {
         longPressSpeedingEnabled = enabled;
     }
@@ -5141,7 +5172,7 @@ public final class Player implements
     public boolean getLongPressSpeedingEnabled() {
         return longPressSpeedingEnabled;
     }
-    
+
     public void onBufferingFailed() {
         pause();
         pauseBCPlayer();

@@ -12,7 +12,7 @@ android {
 
     defaultConfig {
         applicationId "InfinityLoop1309.NewPipeEnhanced"
-        resValue "string", "app_name", "PipePipe"
+        resValue "string", "app_name", "Offline PipePipe"
         minSdk 21
         //noinspection ExpiredTargetSdkVersion
         targetSdk 33
@@ -62,7 +62,7 @@ android {
             if (true) {
                 // default values when branch name could not be determined or is master or dev
                 applicationIdSuffix ".debug"
-                resValue "string", "app_name", "PipePipe Debug"
+                resValue "string", "app_name", "Offline PipePipeᵈ"
             } else {
                 applicationIdSuffix ".debug." + normalizedWorkingBranch
                 resValue "string", "app_name", "PipePipe " + workingBranch
